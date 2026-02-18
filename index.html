@@ -6,7 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Blocked - Focus Mode</title>
 
-  <!-- Sinhala Unicode Font Support -->
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@400;700&display=swap" rel="stylesheet">
 
   <style>
@@ -20,7 +19,7 @@
       --muted: rgba(255,255,255,0.85);
     }
 
-    * { box-sizing: border-box; }
+    *{ box-sizing: border-box; }
 
     body{
       font-family: 'Noto Sans Sinhala', Arial, sans-serif;
@@ -28,38 +27,36 @@
       color: var(--text);
       text-align: center;
       margin: 0;
-      padding: 40px 18px;
+      padding: 28px 16px;
+      zoom: 1.2; /* 120% bigger overall */
     }
 
     h1{
-      font-size: 40px;
-      margin: 0 0 30px 0;
+      font-size: 34px;
+      margin: 0 0 18px 0;
       line-height: 1.2;
     }
 
-    /* Middle section wrapper: images left, goals right */
     .mid{
       max-width: 1100px;
-      margin: 0 auto 30px auto;
+      margin: 0 auto 18px auto;
       display: flex;
-      gap: 22px;
+      gap: 16px;
       align-items: stretch;
       justify-content: center;
     }
 
-    /* Left: 4 images */
     .images{
-      flex: 1 1 55%;
+      flex: 0 0 420px;
       display: grid;
-      grid-template-columns: repeat(2, minmax(180px, 1fr));
-      gap: 20px;
-      min-width: 320px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
     }
 
     .card{
       background: var(--card);
-      padding: 15px;
-      border-radius: 15px;
+      padding: 10px;
+      border-radius: 14px;
       border: 1px solid var(--border);
       backdrop-filter: blur(4px);
       -webkit-backdrop-filter: blur(4px);
@@ -67,77 +64,77 @@
 
     .card img{
       width: 100%;
-      height: 180px;
+      height: 110px;
       object-fit: cover;
       border-radius: 10px;
       display: block;
     }
 
     .label{
-      margin-top: 10px;
-      font-size: 18px;
+      margin-top: 6px;
+      font-size: 14px;
       font-weight: 700;
     }
 
-    /* Right: goals */
     .goals{
-      flex: 1 1 45%;
+      flex: 1 1 auto;
       text-align: left;
       background: var(--card2);
       border: 1px solid var(--border);
-      border-radius: 15px;
-      padding: 18px 18px 14px 18px;
-      min-width: 320px;
+      border-radius: 14px;
+      padding: 14px 14px 10px 14px;
       backdrop-filter: blur(4px);
       -webkit-backdrop-filter: blur(4px);
+      min-width: 280px;
     }
 
     .goals h2{
-      margin: 0 0 12px 0;
-      font-size: 22px;
+      margin: 0 0 10px 0;
+      font-size: 18px;
       line-height: 1.25;
     }
 
     .goals ul{
       margin: 0;
-      padding: 0 0 0 0;
+      padding: 0;
       list-style: none;
       display: grid;
-      gap: 10px;
+      gap: 8px;
     }
 
     .goals li{
       display: grid;
-      grid-template-columns: 22px 1fr;
-      gap: 10px;
+      grid-template-columns: 18px 1fr;
+      gap: 8px;
       align-items: start;
       color: var(--muted);
-      line-height: 1.35;
-      font-size: 16px;
+      line-height: 1.25;
+      font-size: 14px;
     }
 
     .tick{
-      width: 18px;
-      height: 18px;
-      border-radius: 6px;
+      width: 14px;
+      height: 14px;
+      border-radius: 5px;
       border: 2px solid rgba(255,255,255,0.65);
       margin-top: 2px;
       display: inline-block;
     }
 
-    /* Responsive: stack on small screens */
+    @media (max-height: 750px){
+      body{ padding: 18px 14px; }
+      h1{ font-size: 28px; margin-bottom: 14px; }
+      .card img{ height: 95px; }
+      .goals li{ font-size: 13px; gap: 7px; }
+      .goals ul{ gap: 7px; }
+    }
+
     @media (max-width: 900px){
-      h1{ font-size: 32px; }
-      .mid{
-        flex-direction: column;
-      }
-      .images{
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        min-width: unset;
-      }
-      .goals{
-        min-width: unset;
-      }
+      h1{ font-size: 28px; }
+      .mid{ flex-direction: column; }
+      .images{ flex: 1 1 auto; width: 100%; max-width: 520px; margin: 0 auto; }
+      .goals{ width: 100%; max-width: 520px; margin: 0 auto; }
+      .card img{ height: 120px; }
     }
   </style>
 </head>
@@ -149,7 +146,6 @@
   </h1>
 
   <div class="mid">
-    <!-- LEFT: 4 images -->
     <div class="images">
       <div class="card">
         <img src="https://media.istockphoto.com/id/1477440242/pt/foto/team-of-ecologist-volunteer-pulling-non-biodegradable-micro-plastic-from-the-endanger-species.jpg?s=612x612&w=0&k=20&c=b7QvUkFM2V-P5PzXEm8Wl5YLXf7X1esxVHfva1MZdLo=" alt="මේක කරපන්">
@@ -172,22 +168,21 @@
       </div>
     </div>
 
-    <!-- RIGHT: new goals -->
     <div class="goals" aria-label="Goals">
-      <h2>Goals (2026–2027)</h2>
+      <h2>🎯ප්‍රධාන ඉලක්ක (2026–2027)</h2>
       <ul>
-        <li><span class="tick" aria-hidden="true"></span><span>In 2026, I perform at a high academic level.</span></li>
-        <li><span class="tick" aria-hidden="true"></span><span>I score more than 18/20 in all my master’s classes, project, and thesis.</span></li>
-        <li><span class="tick" aria-hidden="true"></span><span>I complete my research methodology by the end of February 2026.</span></li>
-        <li><span class="tick" aria-hidden="true"></span><span>I complete my literature review by the end of March 2026.</span></li>
-        <li><span class="tick" aria-hidden="true"></span><span>I complete my master’s project plan by the end of April 2026.</span></li>
-        <li><span class="tick" aria-hidden="true"></span><span>By December 2026, I use R confidently for analysis and visualization.</span></li>
-        <li><span class="tick" aria-hidden="true"></span><span>By December 2026, I use spatial data professionally.</span></li>
-        <li><span class="tick" aria-hidden="true"></span><span>I go to the gym at least three times every week.</span></li>
-        <li><span class="tick" aria-hidden="true"></span><span>I do not forget my academic and personal goals.</span></li>
-        <li><span class="tick" aria-hidden="true"></span><span>In August 2027, I begin preparing my master’s research for publication.</span></li>
-        <li><span class="tick" aria-hidden="true"></span><span>By April 2027, I prepare and apply for a PhD.</span></li>
-        <li><span class="tick" aria-hidden="true"></span><span>By December 2027, I am enrolled in a fisheries PhD program in Germany.</span></li>
+        <li><span class="tick" aria-hidden="true"></span><span>2026 ඉගෙනීමේ වැඩේ උපරිමෙන්ම කරනවා. Everyday!!!</span></li>
+        <li><span class="tick" aria-hidden="true"></span><span>MSc classes, project, thesis හැමදේම 18/20 ට වඩා ගන්නවා. ඒකයි standard එක.</span></li>
+        <li><span class="tick" aria-hidden="true"></span><span>2026 පෙබරවාරි අන්තිමේට methodology එක ඉවර කරනවා.</span></li>
+        <li><span class="tick" aria-hidden="true"></span><span>2026 මාර්තු අන්තිමේට literature review එක ඉවර කරනවා. Solid එකක්.</span></li>
+        <li><span class="tick" aria-hidden="true"></span><span>2026 අප්‍රේල් අන්තිමේට master’s project plan එක පට්ටෙට finalize කරනවා.</span></li>
+        <li><span class="tick" aria-hidden="true"></span><span>2026 දෙසැම්බර් වෙද්දි R analysis + plots දෙකම සිරාවටම confident.</span></li>
+        <li><span class="tick" aria-hidden="true"></span><span>2026 දෙසැම්බර් වෙද්දි QGIS එක professional level එකට අල්ලගන්නවා.</span></li>
+        <li><span class="tick" aria-hidden="true"></span><span>ජිම් එක සතියට අඩුම 3 දවසක්. excuses නෑ—Schedule එකට හරිම.</span></li>
+        <li><span class="tick" aria-hidden="true"></span><span>මගේ Academic and Personal goals මට හොදට මතකයි </span></li>
+        <li><span class="tick" aria-hidden="true"></span><span>2027 අගෝස්තු Master’s research එක publication එකට වැඩ පටන් ගන්නවා.</span></li>
+        <li><span class="tick" aria-hidden="true"></span><span>2027 අප්‍රේල් PhD එකට prepare වෙලා apply කරනවා—plan එකෙන් action එකට.</span></li>
+        <li><span class="tick" aria-hidden="true"></span><span>2027 දෙසැම්බර් ජර්මනියේ fisheries PhD program එකකට enrolled වෙලා ඉන්නවා.</span></li>
       </ul>
     </div>
   </div>
