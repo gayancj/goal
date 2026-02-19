@@ -19,7 +19,6 @@
 
       --text: #ffffff;
       --muted: rgba(255,255,255,0.90);
-
       --pillText: rgba(255,255,255,0.98);
 
       --doneBg: rgba(140, 255, 190, 0.18);
@@ -29,7 +28,6 @@
 
     *{ box-sizing: border-box; }
 
-    /* Layout: header + middle + footer (fits viewport) */
     html, body { height: 100%; }
     body{
       font-family: 'Noto Sans Sinhala', Arial, sans-serif;
@@ -37,51 +35,46 @@
       color: var(--text);
       margin: 0;
       padding: 10px 12px;
-      zoom: 1;
 
       display: flex;
       flex-direction: column;
-      gap: 8px;                 /* sandwich spacing */
+      gap: 8px;
     }
 
-    /* Top & bottom headers */
     h1{
       text-align: center;
       font-size: 22px;
       line-height: 1.18;
       margin: 0;
-      padding: 1px 0;          /* prevents glyph clipping */
+      padding: 1px 0;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       flex: 0 0 auto;
     }
 
-    /* Middle area gets the remaining height */
+    /* 3-column middle: left images | goals | right images */
     .mid{
       flex: 1 1 auto;
-      max-width: 1180px;
+      max-width: 1320px;
       width: 100%;
       margin: 0 auto;
 
-      display: flex;
+      display: grid;
+      grid-template-columns: 210px minmax(520px, 1fr) 210px;
       gap: 12px;
-      align-items: stretch;    /* make both columns same height */
+      align-items: stretch;
       justify-content: center;
 
-      min-height: 0;           /* allow internal sizing without overflow */
+      min-height: 0;
     }
 
-    /* LEFT images column should MATCH goals panel height */
     .images{
-      flex: 0 0 210px;
       height: 100%;
-
       display: grid;
       grid-template-columns: 1fr;
-      grid-template-rows: repeat(4, 1fr);  /* split available height into 4 equal cards */
+      grid-template-rows: repeat(4, 1fr);
       gap: 8px;
-
       min-height: 0;
     }
 
@@ -99,24 +92,22 @@
 
     .card img{
       width: 100%;
-      height: 100%;            /* fill the card */
+      height: 100%;
       object-fit: cover;
       border-radius: 10px;
       display: block;
     }
 
-    /* RIGHT goals panel */
     .goals{
-      flex: 1 1 auto;
       height: 100%;
-      min-width: 320px;
       min-height: 0;
 
       text-align: left;
       background: var(--card2);
       border: 1px solid var(--border);
       border-radius: 14px;
-      padding: 10px 12px 10px 12px;
+
+      padding: 10px 12px;
       backdrop-filter: blur(4px);
       -webkit-backdrop-filter: blur(4px);
 
@@ -124,7 +115,6 @@
       flex-direction: column;
     }
 
-    /* Goals header */
     .goals h2{
       margin: 0 0 8px 0;
       font-size: 16px;
@@ -149,7 +139,6 @@
       font-variant-numeric: tabular-nums;
     }
 
-    /* List fills remaining space without forcing scroll in normal 14" use */
     .goals ul{
       margin: 0;
       padding: 0;
@@ -160,17 +149,14 @@
       min-height: 0;
     }
 
-    /* ====== REQUEST: increase goals text size by 120% ======
-       Previous was 12.5px -> 15px (exactly 1.2x).
-    */
     .goals li{
       display: grid;
-      grid-template-columns: 18px 1fr 160px;
-      column-gap: 8px;
+      grid-template-columns: 18px 1fr 140px;
+      column-gap: 6px;
       align-items: start;
       color: var(--muted);
 
-      font-size: 15px;      /* 12.5 * 1.2 = 15 */
+      font-size: 15px;
       line-height: 1.18;
     }
 
@@ -195,7 +181,7 @@
     }
 
     .countdown{
-      width: 145px;
+      width: 132px;
       text-align: center;
       padding: 4px 8px;
       border-radius: 999px;
@@ -210,7 +196,6 @@
       box-shadow: inset 0 0 0 1px rgba(0,0,0,0.10);
     }
 
-    /* Completed styling */
     li.completed .countdown{
       background: var(--doneBg) !important;
       border-color: var(--doneBorder) !important;
@@ -222,12 +207,12 @@
       opacity: 0.92;
     }
 
-    /* If viewport height is small, compress a bit to keep footer visible */
     @media (max-height: 760px){
       body{ padding: 8px 10px; gap: 6px; }
-
       h1{ font-size: 20px; }
-      .images{ flex-basis: 200px; gap: 7px; }
+
+      .mid{ gap: 10px; grid-template-columns: 200px minmax(500px, 1fr) 200px; }
+      .images{ gap: 7px; }
       .card{ padding: 5px; }
 
       .goals{ padding: 9px 10px; }
@@ -235,32 +220,15 @@
       .now{ font-size: 10.5px; padding: 3px 7px; }
 
       .goals ul{ gap: 5px; }
-      .goals li{ font-size: 14px; }
-      .countdown{ width: 140px; font-size: 10.5px; padding: 4px 7px; }
-      .goals li{ grid-template-columns: 18px 1fr 155px; }
+      .goals li{ font-size: 14px; grid-template-columns: 18px 1fr 132px; column-gap: 5px; }
+      .countdown{ width: 125px; font-size: 10.5px; padding: 4px 7px; }
     }
 
-    /* Mobile: stack layout */
-    @media (max-width: 900px){
-      body{ gap: 10px; }
-      .mid{ flex-direction: column; }
-
-      .images{
-        width: 100%;
-        max-width: 560px;
-        margin: 0 auto;
-        height: auto;
-        grid-template-rows: none;
-      }
-      .card{ min-height: 0; }
+    @media (max-width: 1100px){
+      .mid{ grid-template-columns: 1fr; }
+      .images{ height: auto; grid-template-rows: none; }
       .card img{ height: 120px; }
-
-      .goals{
-        width: 100%;
-        max-width: 560px;
-        margin: 0 auto;
-        height: auto;
-      }
+      .goals{ height: auto; }
 
       .goals li{
         grid-template-columns: 18px 1fr;
@@ -277,24 +245,26 @@
 
 <body>
 
-  <h1>හුත්තෝ!!! රිසර්ච් එක කරපන්. ජිම් එකට පලයන්. උඹේ ටාගට් එක පී.එච්.ඩී. එකක්</h1>
+  <h1>හුත්තෝ!!! රිසර්ච් එක කරපන්. ජිම් එකට පලයන්. උඹේ ටාගට් එක පී.එච්.ඩී. එකක්!!!</h1>
 
   <div class="mid">
-    <div class="images" aria-label="Focus images">
+    <!-- LEFT images -->
+    <div class="images" aria-label="Focus images left">
       <div class="card">
-        <img src="https://media.istockphoto.com/id/1477440242/pt/foto/team-of-ecologist-volunteer-pulling-non-biodegradable-micro-plastic-from-the-endanger-species.jpg?s=612x612&w=0&k=20&c=b7QvUkFM2V-P5PzXEm8Wl5YLXf7X1esxVHfva1MZdLo=" alt="Focus image 1">
+        <img src="https://uaf.edu/news/images/peter-westley-salmon.jpeg" alt="Focus image 1">
       </div>
       <div class="card">
-        <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061" alt="Focus image 2">
+        <img src="https://media.springernature.com/lw685/springer-static/image/art%3A10.1038%2Fs41467-020-17726-z/MediaObjects/41467_2020_17726_Fig2_HTML.png?as=webp" alt="Focus image 2">
       </div>
       <div class="card">
-        <img src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8" alt="Focus image 3">
+        <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438" alt="Focus image 3">
       </div>
       <div class="card">
-        <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438" alt="Focus image 4">
+        <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061" alt="Focus image 4">
       </div>
     </div>
 
+    <!-- GOALS -->
     <div class="goals" aria-label="Goals">
       <h2>
         🎯ප්‍රධාන ඉලක්ක (2026–2027)
@@ -302,7 +272,6 @@
       </h2>
 
       <ul>
-        <!-- Ongoing -->
         <li data-deadline="ongoing" data-id="g_ongoing_study">
           <input class="bulletToggle" type="checkbox" aria-label="Completed">
           <span class="goalText">2026 ඉගෙනීමේ වැඩේ උපරිමෙන්ම කරනවා. Everyday!!!</span>
@@ -321,7 +290,6 @@
           <span class="timerCell"><span class="countdown" data-ongoing="1">Ongoing</span></span>
         </li>
 
-        <!-- Timed -->
         <li data-deadline="2026-02-28T23:59:59" data-id="g_methodology_2026_02">
           <input class="bulletToggle" type="checkbox" aria-label="Completed">
           <span class="goalText">2026 පෙබරවාරි අන්තිමේට methodology එක ඉවර කරනවා.</span>
@@ -382,6 +350,26 @@
           <span class="timerCell"><span class="countdown" data-target="2027-12-31T23:59:59">—</span></span>
         </li>
       </ul>
+    </div>
+
+    <!-- RIGHT images (updated topics) -->
+    <div class="images" aria-label="Focus images right">
+      <!-- R1: studying hard -->
+      <div class="card">
+        <img src="https://oxfordlearning.com/wp-content/uploads/2025/03/tips-for-easier-studying.jpg" alt="Studying hard">
+      </div>
+      <!-- R2: R programming -->
+      <div class="card">
+        <img src="https://thewhiteboard.co.in/asset/images/course/R%20Programming%20Course%20Hyderabad%20Bangalore.jpeg" alt="R programming / coding">
+      </div>
+      <!-- R3: GIS -->
+      <div class="card">
+        <img src="https://www.wigeogis.com/homepage/hp16/images/qgis_software_geomarketing_eng_lg.webp" alt="GIS / maps / spatial analysis">
+      </div>
+      <!-- R4: PhD graduation -->
+      <div class="card">
+        <img src="https://www.bgsu.edu/content/dam/BGSU/news/2023/04/resize-DSC09653.jpg" alt="Graduation / PhD goal">
+      </div>
     </div>
   </div>
 
