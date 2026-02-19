@@ -271,7 +271,9 @@
         <span class="now" id="now">Now: —</span>
       </h2>
 
-      <ul>
+      <!-- NOTE: we will reorder these <li> dynamically in JS (see script) -->
+      <ul id="goalsList">
+        <!-- Ongoing -->
         <li data-deadline="ongoing" data-id="g_ongoing_study">
           <input class="bulletToggle" type="checkbox" aria-label="Completed">
           <span class="goalText">2026 ඉගෙනීමේ වැඩේ උපරිමෙන්ම කරනවා. Everyday!!!</span>
@@ -290,6 +292,7 @@
           <span class="timerCell"><span class="countdown" data-ongoing="1">Ongoing</span></span>
         </li>
 
+        <!-- Timed -->
         <li data-deadline="2026-02-28T23:59:59" data-id="g_methodology_2026_02">
           <input class="bulletToggle" type="checkbox" aria-label="Completed">
           <span class="goalText">2026 පෙබරවාරි අන්තිමේට methodology එක ඉවර කරනවා.</span>
@@ -352,21 +355,17 @@
       </ul>
     </div>
 
-    <!-- RIGHT images (updated topics) -->
+    <!-- RIGHT images -->
     <div class="images" aria-label="Focus images right">
-      <!-- R1: studying hard -->
       <div class="card">
         <img src="https://oxfordlearning.com/wp-content/uploads/2025/03/tips-for-easier-studying.jpg" alt="Studying hard">
       </div>
-      <!-- R2: R programming -->
       <div class="card">
         <img src="https://thewhiteboard.co.in/asset/images/course/R%20Programming%20Course%20Hyderabad%20Bangalore.jpeg" alt="R programming / coding">
       </div>
-      <!-- R3: GIS -->
       <div class="card">
         <img src="https://www.wigeogis.com/homepage/hp16/images/qgis_software_geomarketing_eng_lg.webp" alt="GIS / maps / spatial analysis">
       </div>
-      <!-- R4: PhD graduation -->
       <div class="card">
         <img src="https://www.bgsu.edu/content/dam/BGSU/news/2023/04/resize-DSC09653.jpg" alt="Graduation / PhD goal">
       </div>
@@ -378,6 +377,10 @@
   <script>
     (function(){
       const nowEl = document.getElementById('now');
+      const listEl = document.getElementById('goalsList');
+
+      const DAY_MS = 24 * 60 * 60 * 1000;
+      const THRESHOLD_DAYS = 100;
 
       function pad2(n){ return String(n).padStart(2,'0'); }
 
@@ -404,24 +407,18 @@
       }
 
       function applyTrafficLightColor(el, diffMs){
-        const dayMs = 24 * 60 * 60 * 1000;
-        const days = diffMs / dayMs;
+        const days = diffMs / DAY_MS;
         const d = Math.max(-9999, Math.min(99999, days));
-
         let bg, border;
 
         if (d <= 7){
-          bg = 'hsla(0, 95%, 45%, 0.70)';      // RED
-          border = 'hsla(0, 95%, 65%, 0.85)';
+          bg = 'hsla(0, 95%, 45%, 0.70)';      border = 'hsla(0, 95%, 65%, 0.85)';
         } else if (d <= 30){
-          bg = 'hsla(35, 98%, 45%, 0.70)';     // AMBER
-          border = 'hsla(35, 98%, 65%, 0.85)';
+          bg = 'hsla(35, 98%, 45%, 0.70)';     border = 'hsla(35, 98%, 65%, 0.85)';
         } else if (d <= 60){
-          bg = 'hsla(55, 98%, 45%, 0.70)';     // YELLOW
-          border = 'hsla(55, 98%, 65%, 0.85)';
+          bg = 'hsla(55, 98%, 45%, 0.70)';     border = 'hsla(55, 98%, 65%, 0.85)';
         } else if (d <= 90){
-          bg = 'hsla(85, 80%, 40%, 0.70)';     // YELLOW-GREEN
-          border = 'hsla(85, 80%, 60%, 0.85)';
+          bg = 'hsla(85, 80%, 40%, 0.70)';     border = 'hsla(85, 80%, 60%, 0.85)';
         } else {
           const cap = 365;
           const t = Math.min(1, d / cap);
@@ -467,8 +464,77 @@
           cb.checked = saved;
           if (saved) setCompleted(li, cd, true);
 
-          cb.addEventListener('change', () => setCompleted(li, cd, cb.checked));
+          cb.addEventListener('change', () => {
+            setCompleted(li, cd, cb.checked);
+            reorderGoals(); // keep ordering consistent after completion toggles
+          });
         });
+      }
+
+      // ====== NEW: ordering rule you requested ======
+      // - Always keep ALL goals with < 100 days at the top (soon goals)
+      // - Keep ongoing goals BELOW those soon goals (and above far future goals)
+      // - Everything else (>= 100 days) after ongoing goals, ordered by deadline
+      function reorderGoals(){
+        if (!listEl) return;
+
+        const now = Date.now();
+        const items = Array.from(listEl.querySelectorAll('li'));
+
+        function isOngoing(li){
+          const cd = li.querySelector('.countdown');
+          return cd && cd.hasAttribute('data-ongoing');
+        }
+
+        function getTargetMs(li){
+          const cd = li.querySelector('.countdown');
+          if (!cd) return NaN;
+          const iso = cd.getAttribute('data-target');
+          if (!iso) return NaN;
+          const t = new Date(iso).getTime();
+          return t;
+        }
+
+        function remainingDays(li){
+          const t = getTargetMs(li);
+          if (Number.isNaN(t)) return Infinity;
+          return (t - now) / DAY_MS;
+        }
+
+        // Partition
+        const soonTimed = [];
+        const ongoing = [];
+        const farTimed = [];
+
+        items.forEach(li => {
+          if (isOngoing(li)){
+            ongoing.push(li);
+            return;
+          }
+
+          const d = remainingDays(li);
+
+          // overdue counts as "soon" (it's urgent)
+          if (d < THRESHOLD_DAYS){
+            soonTimed.push(li);
+          } else {
+            farTimed.push(li);
+          }
+        });
+
+        // Sort timed buckets by nearest deadline first
+        const sortByDeadlineAsc = (a, b) => getTargetMs(a) - getTargetMs(b);
+        soonTimed.sort(sortByDeadlineAsc);
+        farTimed.sort(sortByDeadlineAsc);
+
+        // Keep original order for ongoing (or sort by data-id if you want)
+        // ongoing stays as-is.
+
+        // Rebuild DOM in the required order
+        const ordered = [...soonTimed, ...ongoing, ...farTimed];
+        const frag = document.createDocumentFragment();
+        ordered.forEach(li => frag.appendChild(li));
+        listEl.appendChild(frag);
       }
 
       function updateCountdowns(){
@@ -523,6 +589,7 @@
       function tick(){
         updateNow();
         updateCountdowns();
+        reorderGoals(); // <-- keeps ongoing goals "moving down" as more timed goals enter <100 days
       }
 
       initBulletCheckboxes();
