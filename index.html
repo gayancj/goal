@@ -271,7 +271,6 @@
         <span class="now" id="now">Now: —</span>
       </h2>
 
-      <!-- NOTE: we will reorder these <li> dynamically in JS (see script) -->
       <ul id="goalsList">
         <!-- Ongoing -->
         <li data-deadline="ongoing" data-id="g_ongoing_study">
@@ -382,6 +381,9 @@
       const DAY_MS = 24 * 60 * 60 * 1000;
       const THRESHOLD_DAYS = 100;
 
+      // blink cadence control (medium)
+      const OVERDUE_TOGGLE_MS = 650; // medium (not slow, not fast)
+
       function pad2(n){ return String(n).padStart(2,'0'); }
 
       function updateNow(){
@@ -404,6 +406,18 @@
         const h = hr % 24;
         const days = Math.floor(hr / 24);
         return `${days}d ${pad2(h)}h ${pad2(m)}m ${pad2(s)}s`;
+      }
+
+      // NEW: negative formatted countdown for overdue state
+      function formatNegative(ms){
+        const sec = Math.max(0, Math.floor(Math.abs(ms) / 1000));
+        const s = sec % 60;
+        const min = Math.floor(sec / 60);
+        const m = min % 60;
+        const hr = Math.floor(min / 60);
+        const h = hr % 24;
+        const days = Math.floor(hr / 24);
+        return `-${days}d ${pad2(h)}h ${pad2(m)}m ${pad2(s)}s`;
       }
 
       function applyTrafficLightColor(el, diffMs){
@@ -446,6 +460,10 @@
           countdownEl.style.background = '';
           countdownEl.style.borderColor = '';
           countdownEl.style.boxShadow = '';
+
+          // stop overdue blink state if any
+          countdownEl.removeAttribute('data-overdue');
+          countdownEl.removeAttribute('data-overdue-toggle');
         } else {
           localStorage.removeItem(storageKey(id));
           li.classList.remove('completed');
@@ -466,15 +484,11 @@
 
           cb.addEventListener('change', () => {
             setCompleted(li, cd, cb.checked);
-            reorderGoals(); // keep ordering consistent after completion toggles
+            reorderGoals();
           });
         });
       }
 
-      // ====== NEW: ordering rule you requested ======
-      // - Always keep ALL goals with < 100 days at the top (soon goals)
-      // - Keep ongoing goals BELOW those soon goals (and above far future goals)
-      // - Everything else (>= 100 days) after ongoing goals, ordered by deadline
       function reorderGoals(){
         if (!listEl) return;
 
@@ -491,8 +505,7 @@
           if (!cd) return NaN;
           const iso = cd.getAttribute('data-target');
           if (!iso) return NaN;
-          const t = new Date(iso).getTime();
-          return t;
+          return new Date(iso).getTime();
         }
 
         function remainingDays(li){
@@ -501,7 +514,6 @@
           return (t - now) / DAY_MS;
         }
 
-        // Partition
         const soonTimed = [];
         const ongoing = [];
         const farTimed = [];
@@ -513,8 +525,6 @@
           }
 
           const d = remainingDays(li);
-
-          // overdue counts as "soon" (it's urgent)
           if (d < THRESHOLD_DAYS){
             soonTimed.push(li);
           } else {
@@ -522,19 +532,19 @@
           }
         });
 
-        // Sort timed buckets by nearest deadline first
         const sortByDeadlineAsc = (a, b) => getTargetMs(a) - getTargetMs(b);
         soonTimed.sort(sortByDeadlineAsc);
         farTimed.sort(sortByDeadlineAsc);
 
-        // Keep original order for ongoing (or sort by data-id if you want)
-        // ongoing stays as-is.
-
-        // Rebuild DOM in the required order
         const ordered = [...soonTimed, ...ongoing, ...farTimed];
         const frag = document.createDocumentFragment();
         ordered.forEach(li => frag.appendChild(li));
         listEl.appendChild(frag);
+      }
+
+      // NEW: toggle state for overdue banner (Overdue <-> negative time)
+      function overdueShouldShowWord(nowMs){
+        return Math.floor(nowMs / OVERDUE_TOGGLE_MS) % 2 === 0;
       }
 
       function updateCountdowns(){
@@ -576,9 +586,13 @@
           const diff = target - now;
 
           if (diff <= 0){
-            cd.textContent = 'Overdue';
+            // keep overdue styling as before
             cd.style.background = 'hsla(0, 95%, 45%, 0.70)';
             cd.style.borderColor = 'hsla(0, 95%, 65%, 0.85)';
+
+            // medium blink switching between "Overdue" and negative time
+            const showWord = overdueShouldShowWord(now);
+            cd.textContent = showWord ? 'Overdue' : formatNegative(diff);
           } else {
             cd.textContent = formatRemaining(diff);
             applyTrafficLightColor(cd, diff);
@@ -589,7 +603,7 @@
       function tick(){
         updateNow();
         updateCountdowns();
-        reorderGoals(); // <-- keeps ongoing goals "moving down" as more timed goals enter <100 days
+        reorderGoals();
       }
 
       initBulletCheckboxes();
